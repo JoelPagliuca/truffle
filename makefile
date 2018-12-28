@@ -41,7 +41,7 @@ build-macos: *.go ## macos compilation
 cross: build-linux build-macos ## Builds the cross-compiled binaries
 	@echo "+ $@"
 
-test: ## Run some tests against a test project
+test: build ## Run some tests against a test project
 	@echo "+ $@"
 	./scripts/setup-test-harness.sh
 

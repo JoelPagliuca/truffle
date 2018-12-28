@@ -1,15 +1,42 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
-func usage() {
-	flag.Usage()
+func checkFile(filename string) {
+	fmt.Println("checking " + filename)
+	file, _ := os.Open(filename)
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+}
+
+func checkCommit() {
+	var cmd *exec.Cmd
+	args := []string{"diff", "--cached", "--diff-filter", "ACMU", "--name-only"}
+	cmd = exec.Command("git", args...)
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Run()
+	commandOutput := stdout.String()
+	splitCommandOutput := strings.Split(commandOutput, "\n")
+	for _, filename := range splitCommandOutput {
+		if filename == "" {
+			continue
+		}
+		checkFile(filename)
+	}
 }
 
 func main() {
@@ -24,7 +51,7 @@ func main() {
 	}
 
 	if *helpFlag {
-		usage()
+		flag.Usage()
 		os.Exit(0)
 	}
 
@@ -35,6 +62,6 @@ func main() {
 	}
 
 	// no flags means we're being called by git
-	fmt.Println("Being called as a hook, args:", positionalArgs)
-	os.Exit(0)
+	checkCommit()
+	os.Exit(1)
 }
