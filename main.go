@@ -9,16 +9,29 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
+// VERBOSE turn on logging
+var VERBOSE = true
+
+// maybe use `git diff --unified=0 --staged filename`
 func checkFile(filename string) {
-	fmt.Println("checking " + filename)
+	log.Println("checking " + filename)
+	nocommit := regexp.MustCompile(`.*[\#|\/\/]\s?nocommit`)
 	file, _ := os.Open(filename)
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		match := nocommit.MatchString(scanner.Text())
+		if match {
+			fmt.Println("## NOCOMMIT ##")
+			fmt.Println("The following line triggered the hook")
+			fmt.Println(filename+":", scanner.Text())
+			fmt.Println("## ######## ##")
+			os.Exit(1)
+		}
 	}
 }
 
@@ -40,6 +53,9 @@ func checkCommit() {
 }
 
 func main() {
+	if !VERBOSE {
+		log.SetFlags(0)
+	}
 	helpFlag := flag.Bool("h", false, "Display this help text")
 	installFlag := flag.Bool("i", false, "Run in install mode, provide install path as positional arg")
 	flag.Parse()
@@ -58,10 +74,11 @@ func main() {
 	if *installFlag {
 		installPath := positionalArgs[0]
 		fmt.Println("Installing " + binaryPath + " into " + installPath)
+		// TODO: actually do this
 		os.Exit(0)
 	}
 
 	// no flags means we're being called by git
 	checkCommit()
-	os.Exit(1)
+	os.Exit(0)
 }
