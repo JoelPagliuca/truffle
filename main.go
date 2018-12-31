@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -14,9 +16,36 @@ import (
 )
 
 // VERBOSE turn on logging
-var VERBOSE = true
+var VERBOSE = false
 
-// maybe use `git diff --unified=0 --staged filename`
+func installHook(binaryPath, installPath string) {
+	// check if the install path is a git repository
+	gitDirectoryPath := filepath.Join(installPath, ".git")
+	_, err := os.Stat(gitDirectoryPath)
+	if os.IsNotExist(err) {
+		log.Fatal(installPath, "is not a git repository")
+	}
+	// find the hooks folder
+	destinationPath := filepath.Join(gitDirectoryPath, "hooks", "pre-commit")
+	destination, _ := os.OpenFile(destinationPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775) // TODO err
+	defer destination.Close()
+	// drop the binary into the hooks folder
+	binary, err := os.Open(binaryPath) // probably safe
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer binary.Close()
+	log.Printf("about to copy %s into %s\n", binaryPath, destinationPath)
+	nBytes, err := io.Copy(destination, binary)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if nBytes == 0 {
+		log.Fatal("install failed, no bytes copied")
+	}
+}
+
+// TODO maybe use `git diff --unified=0 --staged filename`
 func checkFile(filename string) {
 	log.Println("checking " + filename)
 	nocommit := regexp.MustCompile(`.*[\#|\/\/]\s?nocommit`)
@@ -55,16 +84,18 @@ func checkCommit() {
 func main() {
 	if !VERBOSE {
 		log.SetFlags(0)
+		log.SetOutput(ioutil.Discard)
 	}
 	helpFlag := flag.Bool("h", false, "Display this help text")
 	installFlag := flag.Bool("i", false, "Run in install mode, provide install path as positional arg")
 	flag.Parse()
 	positionalArgs := flag.Args()
 
-	binaryPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	binaryDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		log.Fatal(err)
 	}
+	binaryPath := filepath.Join(binaryDir, os.Args[0])
 
 	if *helpFlag {
 		flag.Usage()
@@ -72,9 +103,14 @@ func main() {
 	}
 
 	if *installFlag {
+		if flag.NArg() < 1 {
+			flag.Usage()
+			os.Exit(1)
+		}
 		installPath := positionalArgs[0]
-		fmt.Println("Installing " + binaryPath + " into " + installPath)
-		// TODO: actually do this
+		log.Println("Installing " + binaryPath + " into " + installPath)
+		installHook(binaryPath, installPath)
+		log.Println("~Success~")
 		os.Exit(0)
 	}
 
