@@ -59,7 +59,7 @@ func checkFile(filename string) {
 			fmt.Println("The following line triggered the hook")
 			fmt.Println(filename+":", scanner.Text())
 			fmt.Println("## ######## ##")
-			os.Exit(1)
+			os.Exit(56)
 		}
 	}
 }

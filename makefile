@@ -41,13 +41,18 @@ build-macos: *.go ## macos compilation
 cross: build-linux build-macos ## Builds the cross-compiled binaries
 	@echo "+ $@"
 
-test: build ## Run some tests against a test project
+test-setup: build ## Setup the test project for testing
 	@echo "+ $@"
+	rm -rf test-project
 	./scripts/setup-test-harness.sh
+
+test: test-setup ## Run some tests against a test project
+	@echo "+ $@"
+	./nocommit -i test-project
+	./scripts/run-tests.sh
 
 .PHONY: clean
 clean: ## Cleanup any build binaries or packages
 	@echo "+ $@"
 	rm -f $(NAME)
 	rm -rf $(BUILDDIR)
-	rm -rf test-project
