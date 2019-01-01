@@ -46,7 +46,7 @@ test-setup: build ## Setup the test project for testing
 	rm -rf test-project
 	./scripts/setup-test-harness.sh
 
-test: test-setup ## Run some tests against a test project
+test: test-setup ## Run some tests against a test git project
 	@echo "+ $@"
 	./nocommit -i test-project
 	./scripts/run-tests.sh
