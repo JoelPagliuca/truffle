@@ -91,7 +91,8 @@ func main() {
 	flag.Parse()
 	positionalArgs := flag.Args()
 
-	binaryDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	executablePath, _ := os.Executable()
+	binaryDir, err := filepath.Abs(filepath.Dir(executablePath))
 	if err != nil {
 		log.Fatal(err)
 	}
