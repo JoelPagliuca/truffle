@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -45,19 +44,23 @@ func installHook(binaryPath, installPath string) {
 	}
 }
 
-// TODO maybe use `git diff --unified=0 --staged filename`
-func checkFile(filename string) {
+func checkDiff(filename string) {
+	var cmd *exec.Cmd
+	truffle := regexp.MustCompile(`^\+.*[\#|\/\/]\s?truffle`)
 	log.Println("checking " + filename)
-	truffle := regexp.MustCompile(`.*[\#|\/\/]\s?truffle`)
-	file, _ := os.Open(filename)
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		match := truffle.MatchString(scanner.Text())
+	args := []string{"diff", "--unified=0", "--staged", filename}
+	cmd = exec.Command("git", args...)
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Run()
+	commandOutput := stdout.String()
+	splitCommandOutput := strings.Split(commandOutput, "\n")
+	for _, line := range splitCommandOutput {
+		match := truffle.MatchString(line)
 		if match {
 			fmt.Println("## TRUFFLE ##")
 			fmt.Println("The following line triggered the hook")
-			fmt.Println(filename+":", scanner.Text())
+			fmt.Println(filename+":", line[1:])
 			fmt.Println("## ####### ##")
 			os.Exit(56)
 		}
@@ -77,7 +80,7 @@ func checkCommit() {
 		if filename == "" {
 			continue
 		}
-		checkFile(filename)
+		checkDiff(filename)
 	}
 }
 
