@@ -33,12 +33,12 @@ build-linux: *.go ## linux compilation
 build-macos: *.go ## macos compilation
 	@echo "+ $@"
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build $(GO_LDFLAGS) -o $(BUILDDIR)/$(NAME)-macos
-	sha256sum $(BUILDDIR)/$(NAME)-macos > $(BUILDDIR)/$(NAME)-macos.md5;
+	sha256sum $(BUILDDIR)/$(NAME)-macos > $(BUILDDIR)/$(NAME)-macos.sha256
 
 build-windows: *.go ## windows compilation
 	@echo "+ $@"
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build $(GO_LDFLAGS) -o $(BUILDDIR)/$(NAME).exe
-	sha256sum $(BUILDDIR)/$(NAME).exe > $(BUILDDIR)/$(NAME).exe.md5;
+	sha256sum $(BUILDDIR)/$(NAME).exe > $(BUILDDIR)/$(NAME).exe.sha256
 
 .PHONY: cross
 cross: ## Builds the cross-compiled binaries
