@@ -9,37 +9,37 @@ Utility to help you **avoid** committing secrets to repositories
 
 ## Usage
 ```sh
-nocommit -i path/to/your/project
+truffle -i path/to/your/project
 ```
 Now just use either
 ```
-// nocommit
-# nocommit
+// truffle
+# truffle
 ```
 in any lines you shouldn't commit.
 
 e.g.
 ```go
-var devKey = "15f3440f-1cff-475c-84e0-4b716bb9e3cb" // nocommit
+var devKey = "15f3440f-1cff-475c-84e0-4b716bb9e3cb" // truffle
 ```
 
 Any `git commit`s that include these marked lines will be blocked
 
 ## Installation
 ```sh
-go get github.com/JoelPagliuca/nocommit
+go get github.com/JoelPagliuca/truffle
 
 # verify installation success
-nocommit -h
+truffle -h
 ```
-Or grab a binary from [here](https://github.com/JoelPagliuca/nocommit/releases/latest)
+Or grab a binary from [here](https://github.com/JoelPagliuca/truffle/releases/latest)
 
 ## Development
 Using `makefile` for most things.
 
 Set the `VERBOSE` in `main.go` if you want some logging.
 
-I have a test that builds the binary, installs it into a git project, then tries to commit something with a `nocommit` tag.
+I have a test that builds the binary, installs it into a git project, then tries to commit something with a `truffle` tag.
 
 ```
 build-linux           linux compilation

@@ -1,4 +1,4 @@
-NAME := nocommit
+NAME := truffle
 PKG := github.com/JoelPagliuca/$(NAME)
 
 GITCOMMIT := $(shell git rev-parse --short HEAD)
@@ -48,7 +48,7 @@ test-setup: build ## Setup the test project for testing
 
 test: test-setup ## Run some tests against a test git project
 	@echo "+ $@"
-	./nocommit -i test-project
+	./truffle -i test-project
 	./scripts/run-tests.sh
 
 .PHONY: clean

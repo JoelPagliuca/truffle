@@ -48,17 +48,17 @@ func installHook(binaryPath, installPath string) {
 // TODO maybe use `git diff --unified=0 --staged filename`
 func checkFile(filename string) {
 	log.Println("checking " + filename)
-	nocommit := regexp.MustCompile(`.*[\#|\/\/]\s?nocommit`)
+	truffle := regexp.MustCompile(`.*[\#|\/\/]\s?truffle`)
 	file, _ := os.Open(filename)
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		match := nocommit.MatchString(scanner.Text())
+		match := truffle.MatchString(scanner.Text())
 		if match {
-			fmt.Println("## NOCOMMIT ##")
+			fmt.Println("## TRUFFLE ##")
 			fmt.Println("The following line triggered the hook")
 			fmt.Println(filename+":", scanner.Text())
-			fmt.Println("## ######## ##")
+			fmt.Println("## ####### ##")
 			os.Exit(56)
 		}
 	}
