@@ -1,0 +1,20 @@
+branches:
+  only:
+  - master
+  - develop
+  - /^v\d.*$/
+
+language: go
+go: "1.11"
+sudo: disabled
+script:
+  - make test
+  - make cross
+deploy:
+  provider: releases
+  api_key: $GHTOKEN
+  file_glob: true
+  file: build/**
+  skip_cleanup: true
+  on:
+    tags: true
