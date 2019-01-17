@@ -34,8 +34,13 @@ truffle -h
 ```
 Or grab a binary from [here](https://github.com/JoelPagliuca/truffle/releases/latest)
 
+## Uninstalling
+`truffle -i` installs itself to your `.git` folder in your project directory, to uninstall it just
+
+`rm path/to/your/project/.git/hooks/pre-commit`
+
 ## Development
-Using `makefile` for most things.
+I'm using `makefile` for most things.
 
 Set the `VERBOSE` in `main.go` if you want some logging.
 
