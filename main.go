@@ -26,7 +26,11 @@ func installHook(binaryPath, installPath string) {
 	}
 	// find the hooks folder
 	destinationPath := filepath.Join(gitDirectoryPath, "hooks", "pre-commit")
-	destination, _ := os.OpenFile(destinationPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775) // TODO err
+	destination, err := os.OpenFile(destinationPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println("Hook installation failed")
+	}
 	defer destination.Close()
 	// drop the binary into the hooks folder
 	binary, err := os.Open(binaryPath) // probably safe
